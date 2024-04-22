@@ -1,0 +1,53 @@
+---
+title: "Supplementary Data Analysis Methods"
+author: "Joseph Womersley"
+engine: knitr
+execute:
+  echo: false
+  include: true
+  error: false
+  message: false
+  warning: false
+format: html
+editor: visual
+bibliography: references.bib
+csl: nature.csl
+---
+
+## Data Description
+
+The data files used in this report: [surfaceome_hspc.csv](https://joewomersley.github.io/report_quarto/hspc_surfaceome.html), [surfaceome_lthsc.csv](https://joewomersley.github.io/report_quarto/lthsc_surfaceome.html), [surfaceome_prog.csv](https://joewomersley.github.io/report_quarto/prog_surfaceome.html), [er_cell_types.csv](https://joewomersley.github.io/report_quarto/er_cell_types.html) and [qPCR_raw_data.xlsx](https://joewomersley.github.io/report_quarto/qPCR_raw_data.html)
+
+The surfaceome data contains Log~2~ absolute expression values. Each row is a gene represented by its ensembl gene id. Also in the files are columns for each specific cell labelled numerically.
+
+The data in [er_cell_types.csv](https://joewomersley.github.io/report_quarto/er_cell_types.html) redefines the previous cell type definitions. Each row is an old cell definition for all of the three cell types. Each column represents a new cell type definition whereby going down the column, a **`1`** indicates that new cell definition can be used to re-define the old cell type, a **`0`** indicates it does not.
+
+The data in [qPCR_raw_data](https://joewomersley.github.io/report_quarto/qPCR_raw_data.html) contains relative abundance values of the *Mmrn1* gene. Each row is a cell and its relative abundance with the columns being the cell_type, followed by *Mmrn1* mean expression. The mean expression is calculated by using expression of *Mmrn1* done in triplicate and normalized against *Hprt* to determine its relative abundance.
+
+## Data Preparation
+
+We used R ([R Core Team 2021](https://www.r-project.org/)) with.**`tidyverse`**.packages [@wickham2019] to import and process the raw data. Differential expression analysis was then performed to determine the log fold change between cell types. We used the .**`findmarkers()`**. function to run this differential analysis within the .**`scran`**. package [@lun2016] which also employs statistical testing upon the analysis to generate p.values and false discovery rate.
+
+## Visualisation through Mean Expression Plots with Error Bars and Histograms
+
+Mean expression plots with error bars and histograms were used to visualise the gene expression across the cells and genes to ensure they are similar across the cell types, and also to ensure that there were minimal outliers, as well as to further understand the distribution in expression. The .**`tidyverse`**.packages [@wickham2019] were used to generate the plots.
+
+## Volcano Plots
+
+Volcano plots were then used to visualise the differential analysis through using the .**`ggplot2`**. package [@ggplot2] whereby we coloured points with  q \< 0.05 where q is the False Discovery Rate (FDR) adjusted p-value. FDR is a method of correcting for multiple comparisons by the Benjamini--Hochberg procedure [@benjamini1995]. Additionally, we labelled points with their corresponding gene name, when their Log fold change was greater than 2.5. We did this using the .**`BiomaRt`**. package [@biomaRt] and created a logical variable .**`bigfc`**. which represents whether the absolute value of the log fold change for a particular gene exceeds 2.5, and used the .**`ggrepel`**. package to avoid labels overlapping.
+
+## Bar Plots
+
+All bar plots were produced using .**`tidyverse`**.packages [@wickham2019], specifically the .**`ggplot2`**. package [@ggplot2]. Whereby all bars have their standard error also visualised, Error bars are x¯±1s.e. where s.e. is the standard error of the mean. P values: *\*, P \< 0.05; \*\**, P \< 0.01; \*\*\*, P \< 0.001; \*\*\*\*, P \< 0.0001.
+
+## Tables
+
+Tables were generated to show differentially expressed genes (logFC \> 1) for each of the three comparisons, both with and without duplicate genes showing different comparisons. The .**`knitr`**. package [@knitr] was used to enable the analysis and the .**`KableExtra`**. package [@kableExtra] was used to format the tables.
+
+## Visualisation With Principal Components Analysis
+
+Dimensionality-reduction was performed on the Log~2~-transposed absolute expression data of the 280 genes by using principle component analysis. The Package .**`Plotly`**. [@plotly] was used to visualise the first 3 principle components, generating a three-dimensional PCA plot.
+
+## Heatmaps And Clustering
+
+Hierarchical clustering was performed and heatmaps produced with the package .**`Pheatmap`**. [@pheatmap] with .**`BiomaRt`**. [@biomaRt] used to convert the ensembl gene ids to gene names. Hierarchical clustering used the Ward.D2 method and was performed for both genes and cells. For the heatmaps, only the top 50 significantly differentially expressed genes were visualised. Genes were deemed significantly differentially expressed when LogFC \> 1, which left 101 genes; we took the top 50 of these genes and deemed them significant by  q \< 0.01.
